@@ -9,8 +9,8 @@ Setiap pengguna wajib login untuk mendapatkan token, dan token tersebut harus di
 
 ### 🔐 Autentikasi
 - **Register** pengguna baru  
-- **Login** dengan username & password  
-- **Logout** untuk menghapus token aktif  
+- **Login** dengan username & password, dan masuk aplikasi
+- **Logout** untuk menghapus token aktif dan keluar dari aplikasi
 
 ### 👥 Role & Hak Akses
 - **Admin**

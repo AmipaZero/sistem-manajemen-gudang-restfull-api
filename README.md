@@ -15,34 +15,26 @@ Setiap pengguna wajib login untuk mendapatkan token, dan token tersebut harus di
 ### 👥 Role & Hak Akses
 - **Admin**
   - Memiliki akses penuh ke semua fitur sistem  
-  - Dapat mengelola barang, kategori, inbound, outbound  
-  - Memiliki **hak khusus untuk mengakses laporan gudang** (stok, transaksi masuk/keluar, histori per barang)  
+  - Dapat mengelola produk, inbound, outbound  
+  - Memiliki **hak khusus untuk mengakses laporan gudang**
 - **Staff**
-  - Hanya bisa mengelola barang, kategori, inbound, dan outbound  
+  - Hanya bisa mengelola produk, inbound, dan outbound  
   - **Tidak memiliki akses** ke fitur laporan  
-
-### 📦 Manajemen Barang
-- Tambah, ubah, hapus, dan lihat daftar barang  
-- Barang memiliki stok, kategori, dan informasi detail  
-
-### 🏷️ Manajemen Kategori
-- Tambah, ubah, hapus, dan lihat daftar kategori  
-- Barang wajib terkait dengan kategori tertentu
 
 ### 📦 Produk
 - Menambahkan produk baru ke dalam gudang  
-- Menambahkan stok produk yang sudah ada 
+- Menambahkan stok produk yang sudah ada  
 - Mendukung lebih dari satu produk dalam satu transaksi inbound  
 
-### 📥 Inbounds (Barang Masuk)
-- Menambahkan stok barang ke gudang  
-- Menyimpan riwayat inbound setiap barang  
-- Mendukung lebih dari satu barang dalam satu transaksi inbound  
+### 📥 Inbounds (Produk Masuk)
+- Menambahkan stok produk ke gudang  
+- Menyimpan riwayat inbound setiap produk  
+- Mendukung lebih dari satu produk dalam satu transaksi inbound  
 
-### 📤 Outbounds (Barang Keluar)
-- Mengurangi stok barang dari gudang  
-- Menyimpan riwayat outbound setiap barang  
-- Mendukung lebih dari satu barang dalam satu transaksi outbound  
+### 📤 Outbounds (Produk Keluar)
+- Mengurangi stok produk dari gudang  
+- Menyimpan riwayat outbound setiap produk  
+- Mendukung lebih dari satu produk dalam satu transaksi outbound  
 ---
 ## 🛠️ Teknologi yang Digunakan
 - **Golang** (Backend API)  

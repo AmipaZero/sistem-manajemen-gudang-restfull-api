@@ -23,7 +23,6 @@ func (c *ProductController) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.PUT("/products/:id",middleware.StaffOrAdmin(), c.UpdateProduct)
 	rg.DELETE("/products/:id", middleware.StaffOrAdmin(),c.DeleteProduct)
 	rg.GET("/report-products",  middleware.AdminOnly() ,c.LaporanProduct)
-
 }
 
 func (c *ProductController) AddProduct(ctx *gin.Context) {

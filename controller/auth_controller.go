@@ -20,7 +20,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 
 func (c *AuthController) RegisterRoutes(rg *gin.RouterGroup) {
-	// rg.POST("/register", c.Register)
+
 	rg.POST("/login", c.Login)
 
 	auth := rg.Group("/")
@@ -30,19 +30,6 @@ func (c *AuthController) RegisterRoutes(rg *gin.RouterGroup) {
 	}
 }
 
-// func (c *AuthController) Register(ctx *gin.Context) {
-// 		var req service.RegisterRequest
-// 	if err := ctx.ShouldBindJSON(&req); err != nil {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	if err := c.service.Register(&req); err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
-// 	ctx.JSON(http.StatusOK, gin.H{"message": "register success"})
-// }
 
 func (c *AuthController) Login(ctx *gin.Context) {
 		var req struct {

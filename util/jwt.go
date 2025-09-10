@@ -2,10 +2,9 @@ package util
 
 import (
 	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 )
-
-var SecretKey = "secret123"
 
 func GenerateToken(userID uint, role string) (string, error) {
 	claims := jwt.MapClaims{

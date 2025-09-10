@@ -6,11 +6,14 @@ import (
 	"sistem-manajemen-gudang/repository"
 	"sistem-manajemen-gudang/service"
 	"sistem-manajemen-gudang/middleware"
+	"sistem-manajemen-gudang/util"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main(){
+	util.InitEnv()
+	// fmt.Println("SECRET_KEY loaded:", util.SecretKey)
 	config.ConnectDB()
 	db := config.DB
 	authRepo := repository.NewAuthRepository(config.DB)

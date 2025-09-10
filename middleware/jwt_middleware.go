@@ -15,7 +15,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if !strings.HasPrefix(authHeader, "Bearer ") {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "missing token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "token tidak sesuai"})
 			return
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")

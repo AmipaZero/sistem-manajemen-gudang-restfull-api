@@ -3,6 +3,7 @@ package util
 import (
 	"log"
 	"os"
+
 	"github.com/joho/godotenv"
 )
 
@@ -12,12 +13,12 @@ func InitEnv() {
 	// Load .env file
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("No .env file found, reading system environment")
+		log.Println("File .env tidak ditemukan")
 	}
 
 	// Ambil SECRET_KEY dari env
 	SecretKey = os.Getenv("SECRET_KEY")
 	if SecretKey == "" {
-		log.Fatal("SECRET_KEY is required but not set")
+			log.Fatal("SECRET_KEY belum diset")
 	}
 }

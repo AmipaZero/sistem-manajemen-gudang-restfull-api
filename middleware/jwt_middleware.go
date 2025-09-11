@@ -48,7 +48,7 @@ func AdminOnly() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus admin"})
 			return
 		}
-		// Coba cast role ke model.Role
+		//cast model
 		userRole, ok := role.(model.Role)
 		if !ok || string(userRole) != "admin" {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus admin"})
@@ -64,7 +64,8 @@ func StaffOrAdmin() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus staff dan admin"})
 			return
 		}
-		// Coba cast role ke model.Role
+				//cast model
+
 		userRole, ok := role.(model.Role)
 		if !ok || string(userRole) != "staff" && string(userRole) != "admin" {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus staff dan admin"})

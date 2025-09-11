@@ -28,7 +28,7 @@ func (s *userService) Register(req *RegisterRequest) error {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	user := model.User{
 		Username:     req.Username,
-		PasswordHash: string(hash),
+		Password: string(hash),
 		Role:         req.Role,
 	}
 	return s.repo.Save(&user)

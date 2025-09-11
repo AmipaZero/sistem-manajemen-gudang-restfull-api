@@ -24,28 +24,3 @@ func ConnectDB() {
 	DB.AutoMigrate(&model.User{})
 	DB.AutoMigrate(&model.Supplier{})
 }
-// Sistem Manajemen Gudang Perusahaan
-// +----------------+          +-----------------+          +------------------+
-// |   products     |◄────────▶|    inbounds     |          |   outbounds      |
-// +----------------+          +-----------------+          +------------------+
-// | id (PK)        |          | id (PK)         |          | id (PK)          |
-// | name           |          | product_id (FK) |─────────▶| product_id (FK)  |
-// | sku (unique)   |          | quantity        |          | quantity         |
-// | category       |          | received_at     |          | sent_at          |
-// | unit           |          | supplier        |          | destination      |
-// | stock          |          +-----------------+          +------------------+
-// +----------------+
-
-// Relasi:
-// - Satu product bisa punya banyak barang masuk (inbounds)
-// - Satu product bisa punya banyak barang keluar (outbounds)
-// id (PK)
-// username
-// password_hash
-// role          -- enum: admin / staff
-// created_at
-// id (PK)
-// name
-// contact_person
-// phone
-// address

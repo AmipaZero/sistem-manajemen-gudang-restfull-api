@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 )
-// "sistem-manajemen-gudang/middleware"
 type UserService struct {
 	service service.UserService
 }
@@ -13,20 +12,14 @@ type UserService struct {
 func NewUserController(s service.UserService) *UserService {
 	return &UserService{s}
 }
-// func AuthMiddleware() gin.HandlerFunc {
-// 	return middleware.JWTAuthMiddleware()
-// }
 
 
-func (c *UserService) RegisterRoutes(rg *gin.RouterGroup) {
-	rg.POST("/register", c.Register)
-	// // rg.POST("/login", c.Login)
+func (c *UserService) RegisterPublicRoutes(rg *gin.RouterGroup) {
+    rg.POST("/register", c.Register)
+}
 
-	// auth := rg.Group("/")
-	// auth.Use(AuthMiddleware()) // middleware JWT
-	// {
-	// 	auth.DELETE("/logout", c.Logout)
-	// }
+func (c *UserService) RegisterProtectedRoutes(rg *gin.RouterGroup) {
+    rg.GET("/current", c.Current)
 }
 
 func (c *UserService) Register(ctx *gin.Context) {
@@ -43,4 +36,21 @@ func (c *UserService) Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "register success"})
 }
 
+func (c *UserService) Current(ctx *gin.Context) {
+	userIDVal, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	userID := userIDVal.(uint)
+
+	res, err := c.service.CurrentUser(userID)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, res)
+}
 

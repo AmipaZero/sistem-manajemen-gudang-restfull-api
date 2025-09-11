@@ -13,7 +13,6 @@ import (
 
 func main(){
 	util.InitEnv()
-	// fmt.Println("SECRET_KEY loaded:", util.SecretKey)
 	config.ConnectDB()
 	db := config.DB
 	authRepo := repository.NewAuthRepository(config.DB)
@@ -39,13 +38,14 @@ func main(){
 	r := gin.Default()
 	api := r.Group("/")
 	// Public route
-	userController.RegisterRoutes(api)
+	userController.RegisterPublicRoutes(api)
 	authController.RegisterRoutes(api)
 
-		// Protected route (wajib token)
+		// Protected route
 		protected := api.Group("/api")
 		protected.Use(middleware.JWTAuthMiddleware())
 		{
+			userController.RegisterProtectedRoutes(protected)
 			productController.RegisterRoutes(protected)
 			inboundController.RegisterRoutes(protected)
 			outboundController.RegisterRoutes(protected)

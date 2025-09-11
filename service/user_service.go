@@ -18,7 +18,6 @@ func NewUserService(r repository.UserRepository) UserService {
 }
 
 type RegisterRequest struct {
-	Nama     string     `json:"nama"`
 	Username string     `json:"username"`
 	Password string     `json:"password"`
 	Role     model.Role `json:"role"` // admin atau staff

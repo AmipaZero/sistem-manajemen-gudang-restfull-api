@@ -5,18 +5,18 @@ import (
 	"time"
 	"testing"
 	"github.com/stretchr/testify/assert"
-	"sistem-manajemen-gudang/model"
+	"sistem-manajemen-gudang/model/domain"
 	"sistem-manajemen-gudang/service"
 )
 
-// 🔧 Mock Repository
+//  Mock Repository
 type mockInboundRepository struct{}
 
-func (m *mockInboundRepository) Create(p model.Inbound) (model.Inbound, error) {
-	return  model.Inbound{}, nil
+func (m *mockInboundRepository) Create(p domain.Inbound) (domain.Inbound, error) {
+	return  domain.Inbound{}, nil
 }
-func (m *mockInboundRepository) FindAll() ([]model.Inbound, error) {
-	return []model.Inbound{
+func (m *mockInboundRepository) FindAll() ([]domain.Inbound, error) {
+	return []domain.Inbound{
 		
 		{
 			ID:         1,
@@ -24,7 +24,7 @@ func (m *mockInboundRepository) FindAll() ([]model.Inbound, error) {
 			Quantity:   20,
 			ReceivedAt: time.Date(2025, 8, 1, 0, 0, 0, 0, time.UTC),
 			Supplier:   "Supplier A",
-			Product: model.Product{
+			Product: domain.Product{
 				ID:   101,
 				Name: "Monitor Samsung",
 			},
@@ -35,33 +35,33 @@ func (m *mockInboundRepository) FindAll() ([]model.Inbound, error) {
 			Quantity:   30,
 			ReceivedAt: time.Date(2025, 8, 2, 0, 0, 0, 0, time.UTC),
 			Supplier:   "Supplier B",
-			Product: model.Product{
+			Product: domain.Product{
 				ID:   102,
 				Name: "Keyboard Logitech",
 			},
 		},
 	}, nil
 }
-func (m *mockInboundRepository) FindByID(id uint) (model.Inbound, error) {
-	return model.Inbound{
+func (m *mockInboundRepository) FindByID(id uint) (domain.Inbound, error) {
+	return domain.Inbound{
 		ID:         id,
 		ProductID:  10,
 		Quantity:   50,
 		ReceivedAt: time.Date(2025, 8, 5, 0, 0, 0, 0, time.UTC),
 		Supplier:   "PT Sumber Makmur",
-		Product: model.Product{
+		Product: domain.Product{
 			ID:   10,
 			Name: "Laptop ASUS",
 		},
 	}, nil
 }
-func (m *mockInboundRepository) Update(p model.Inbound) (model.Inbound, error) {
+func (m *mockInboundRepository) Update(p domain.Inbound) (domain.Inbound, error) {
 	return p, nil
 }
 func (m *mockInboundRepository) Delete(id uint) error {
 	return nil
 }
-func (m *mockInboundRepository) GetInboundLaporan(start, end string) ([]model.Inbound, error) {
+func (m *mockInboundRepository) GetInboundLaporan(start, end string) ([]domain.Inbound, error) {
 	return nil, nil
 }
 

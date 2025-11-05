@@ -2,12 +2,15 @@ package controller
 
 import (
 	"net/http"
-	"sistem-manajemen-gudang/model"
-	"sistem-manajemen-gudang/service"
-	"sistem-manajemen-gudang/middleware"
 	"time"
+
+	"sistem-manajemen-gudang/helper"
+	"sistem-manajemen-gudang/model/domain"
+	"sistem-manajemen-gudang/service"
+
 	"github.com/gin-gonic/gin"
 )
+
 type OutboundController struct {
 	service service.OutboundService
 }
@@ -16,122 +19,110 @@ func NewOutboundController(s service.OutboundService) *OutboundController {
 	return &OutboundController{service: s}
 }
 
-func (c *OutboundController) RegisterRoutes(rg *gin.RouterGroup) {
-	rg.POST("/outbounds/add", middleware.StaffOrAdmin(), c.AddOutbound)
-	rg.GET("/outbounds", middleware.StaffOrAdmin(),  c.ListOutbound)
-	rg.GET("/outbounds/:id",middleware.StaffOrAdmin(),c.GetByID)
-	rg.PUT("/outbounds/:id", middleware.StaffOrAdmin(),c.UpdateOutbound)
-	rg.DELETE("/outbounds/:id",middleware.StaffOrAdmin(), c.DeleteOutbound)
-	rg.GET("/report-outbounds", middleware.AdminOnly(), c.LaporanOutbound)
-
-}
-
+//  GET /api/outbounds
 func (c *OutboundController) ListOutbound(ctx *gin.Context) {
 	result, err := c.service.GetAll()
-	
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal ambil data"})
+		helper.InternalServerError(ctx, "gagal mengambil data")
 		return
 	}
-	ctx.JSON(http.StatusOK, result)
+	helper.Success(ctx, http.StatusOK, result)
+
 }
 
+//  POST /api/outbounds
 func (c *OutboundController) AddOutbound(ctx *gin.Context) {
-	var p model.Outbound
-	if err := ctx.ShouldBindJSON(&p); err != nil || p.ProductID == 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input tidak valid"})
+	var req domain.Outbound
+	if err := ctx.ShouldBindJSON(&req); err != nil || req.ProductID == 0 {
+		helper.BadRequest(ctx, "Input tidak valid")
 		return
 	}
 
-	result, err := c.service.Create(p)
+	result, err := c.service.Create(req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal simpan"})
+		helper.InternalServerError(ctx, "Gagal menyimpan data")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, result)
+	helper.Success(ctx, http.StatusCreated, result)
 }
 
+//  GET /api/outbounds/:id
 func (c *OutboundController) GetByID(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
 	}
+
 	if err := ctx.ShouldBindUri(&uri); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		helper.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
-	inbound, err := c.service.GetByID(uri.ID)
+	outbound, err := c.service.GetByID(uri.ID)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "Data tidak ditemukan"})
+		helper.NotFound(ctx, "Outbound tidak ditemukan")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, inbound)
+	helper.Success(ctx, http.StatusOK, outbound)
 }
+
+//  PUT /api/outbounds/:id
 func (c *OutboundController) UpdateOutbound(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
 	}
-	var input struct {
-		ProductID  uint      `json:"product_id" binding:"required"`
-		Quantity   int       `json:"quantity" binding:"required"`
-		SentAt time.Time `json:"sent_at" binding:"required"`
-		Destination   string    `json:"destination" binding:"required"`
+	var req struct {
+		ProductID    uint      `json:"product_id" binding:"required"`
+		Quantity     int       `json:"quantity" binding:"required"`
+		SentAt       time.Time `json:"sent_at" binding:"required"`
+		Destination  string    `json:"destination" binding:"required"`
 	}
+
 	if err := ctx.ShouldBindUri(&uri); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
-		return
-	}
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Data input tidak valid"})
+		helper.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
-	inbound := model.Outbound{
-		ID:         uri.ID,
-		ProductID:  input.ProductID,
-		Quantity:   input.Quantity,
-		SentAt:     input.SentAt,
-		Destination: input.Destination,
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helper.BadRequest(ctx, "Data input tidak valid")
+		return
 	}
 
-	updated, err := c.service.Update(inbound)
+	outbound := domain.Outbound{
+		ID:          uri.ID,
+		ProductID:   req.ProductID,
+		Quantity:    req.Quantity,
+		SentAt:      req.SentAt,
+		Destination: req.Destination,
+	}
+
+	updated, err := c.service.Update(outbound)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update"})
+		helper.InternalServerError(ctx, "Gagal memperbarui data")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, updated)
+	helper.Success(ctx, http.StatusOK, updated)
 }
+
+//  DELETE /api/outbounds/:id
 func (c *OutboundController) DeleteOutbound(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
 	}
+
 	if err := ctx.ShouldBindUri(&uri); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		helper.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
-	err := c.service.Delete(uri.ID)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal hapus"})
+	if err := c.service.Delete(uri.ID); err != nil {
+		helper.InternalServerError(ctx, "Gagal menghapus data outbound")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Data berhasil dihapus"})
+	helper.Success(ctx, http.StatusOK, gin.H{"message": "Data outbound berhasil dihapus"})
 }
-func (c *OutboundController) LaporanOutbound(ctx *gin.Context) {
-	startDate := ctx.Query("start")
-	endDate := ctx.Query("end")
 
-	outbounds, err := c.service.GetLaporan(startDate, endDate)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil laporan"})
-		return
-	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"laporan": outbounds,
-	})
-}

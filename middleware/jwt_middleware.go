@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"sistem-manajemen-gudang/config"
-	"sistem-manajemen-gudang/model"
+	"sistem-manajemen-gudang/model/domain"
 	"sistem-manajemen-gudang/util"
 	"net/http"
 	"strings"
@@ -29,7 +29,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 		mapClaims := claims.(jwt.MapClaims)
 		userID := uint(mapClaims["user_id"].(float64))
 
-		var user model.User
+		var user domain.User
 		if err := config.DB.First(&user, userID).Error; err != nil || user.Token == nil || *user.Token != tokenString {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "invalid token"})
 			return
@@ -48,8 +48,8 @@ func AdminOnly() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus admin"})
 			return
 		}
-		//cast model
-		userRole, ok := role.(model.Role)
+		//cast domain
+		userRole, ok := role.(domain.Role)
 		if !ok || string(userRole) != "admin" {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus admin"})
 			return
@@ -64,9 +64,9 @@ func StaffOrAdmin() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus staff dan admin"})
 			return
 		}
-				//cast model
+				//cast domain
 
-		userRole, ok := role.(model.Role)
+		userRole, ok := role.(domain.Role)
 		if !ok || string(userRole) != "staff" && string(userRole) != "admin" {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus staff dan admin"})
 			return

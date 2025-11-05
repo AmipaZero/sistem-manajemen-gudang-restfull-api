@@ -14,12 +14,7 @@ Setiap pengguna wajib login untuk mendapatkan token, dan token tersebut harus di
 
 ### 👥 Role & Hak Akses
 - **Admin**
-  - Memiliki akses penuh ke semua fitur sistem  
-  - Dapat mengelola produk, inbound, outbound  
-  - Memiliki **hak khusus untuk mengakses laporan gudang**
 - **Staff**
-  - Hanya bisa mengelola produk, inbound, dan outbound  
-  - **Tidak memiliki akses** ke fitur laporan  
 
 ### 📦 Produk
 - Menambahkan produk baru ke dalam gudang  

@@ -1,56 +1,56 @@
 package controller
 
 import (
+	"sistem-manajemen-gudang/helper"
+	"sistem-manajemen-gudang/middleware"
 	"sistem-manajemen-gudang/service"
-	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
-type UserService struct {
+
+type UserController struct {
 	service service.UserService
 }
 
-func NewUserController(s service.UserService) *UserService {
-	return &UserService{s}
+func NewUserController(s service.UserService) *UserController {
+	return &UserController{service: s}
 }
 
-
-func (c *UserService) RegisterPublicRoutes(rg *gin.RouterGroup) {
-    rg.POST("/register", c.Register)
+// Middleware JWT untuk user
+func UserMiddleware() gin.HandlerFunc {
+	return middleware.JWTAuthMiddleware()
 }
 
-func (c *UserService) RegisterProtectedRoutes(rg *gin.RouterGroup) {
-    rg.GET("/current", c.Current)
-}
-
-func (c *UserService) Register(ctx *gin.Context) {
-		var req service.RegisterRequest
+// POST /api/register
+func (c *UserController) Register(ctx *gin.Context) {
+	var req service.RegisterRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		helper.BadRequest(ctx, "Input tidak valid: "+err.Error())
 		return
 	}
 
 	if err := c.service.Register(&req); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		helper.InternalServerError(ctx, "Gagal register: "+err.Error())
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "register success"})
+
+	helper.Success(ctx, 200, gin.H{"message": "Register berhasil"})
 }
 
-func (c *UserService) Current(ctx *gin.Context) {
+// GET /api/users/me
+func (c *UserController) Current(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("userID")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		helper.Unauthorized(ctx, "Unauthorized")
 		return
 	}
 
 	userID := userIDVal.(uint)
-
 	res, err := c.service.CurrentUser(userID)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		helper.BadRequest(ctx, "User tidak ditemukan: "+err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, res)
+	helper.Success(ctx, 200, res)
 }
-

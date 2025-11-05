@@ -2,9 +2,10 @@ package config
 
 import (
 	"log"
+	"sistem-manajemen-gudang/model/domain"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"sistem-manajemen-gudang/model"
 )
 
 var DB *gorm.DB
@@ -18,9 +19,8 @@ func ConnectDB() {
 	}
 
 	// Auto migrate
-	DB.AutoMigrate(&model.Product{})
-	DB.AutoMigrate(&model.Inbound{})
-	DB.AutoMigrate(&model.Outbound{})
-	DB.AutoMigrate(&model.User{})
-	DB.AutoMigrate(&model.Supplier{})
+	DB.AutoMigrate(&domain.Product{})
+	DB.AutoMigrate(&domain.Inbound{})
+	DB.AutoMigrate(&domain.Outbound{})
+	DB.AutoMigrate(&domain.User{})
 }

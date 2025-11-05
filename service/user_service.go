@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"sistem-manajemen-gudang/model"
+	"sistem-manajemen-gudang/model/domain"
 	"sistem-manajemen-gudang/repository"
 
 	"golang.org/x/crypto/bcrypt"
@@ -24,12 +24,12 @@ func NewUserService(r repository.UserRepository) UserService {
 type RegisterRequest struct {
 	Username string     `json:"username"`
 	Password string     `json:"password"`
-	Role     model.Role `json:"role"` // admin atau staff
+	Role     domain.Role `json:"role"` // admin atau staff
 }
 // register
 func (s *userService) Register(req *RegisterRequest) error {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	user := model.User{
+	user := domain.User{
 		Username:     req.Username,
 		Password: string(hash),
 		Role:         req.Role,
@@ -39,7 +39,7 @@ func (s *userService) Register(req *RegisterRequest) error {
 
 type UserResponse struct {
 	Username string     `json:"username"`
-	Role     model.Role `json:"role"`
+	Role     domain.Role `json:"role"`
 }
 // user current
 func (s *userService) CurrentUser(userID uint) (*UserResponse, error) {

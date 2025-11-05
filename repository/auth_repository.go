@@ -1,12 +1,12 @@
 package repository
 
 import (
-	"sistem-manajemen-gudang/model"
+	"sistem-manajemen-gudang/model/domain"
 	"gorm.io/gorm"
 )
 
 type AuthRepository interface {
-	FindByUsername(username string) (*model.User, error)
+	FindByUsername(username string) (*domain.User, error)
 	UpdateToken(id uint, token *string) error
 }
 
@@ -18,22 +18,22 @@ func NewAuthRepository(db *gorm.DB) AuthRepository {
 	return &authRepository{db}
 }
 
-// func (r *userRepository) Save(user *model.User) error {
+// func (r *userRepository) Save(user *domain.User) error {
 // 	return r.db.Create(user).Error
 // }
 
-func (r *authRepository) FindByUsername(username string) (*model.User, error) {
-	var user model.User
+func (r *authRepository) FindByUsername(username string) (*domain.User, error) {
+	var user domain.User
 	err := r.db.Where("username = ?", username).First(&user).Error
 	return &user, err
 }
 
 func (r *authRepository) UpdateToken(id uint, token *string) error {
-	return r.db.Model(&model.User{}).Where("id = ?", id).Update("token", token).Error
+	return r.db.Model(&domain.User{}).Where("id = ?", id).Update("token", token).Error
 }
 
-func (r *authRepository) FindById(id uint) (*model.User, error) {
-	var user model.User
+func (r *authRepository) FindById(id uint) (*domain.User, error) {
+	var user domain.User
 	err := r.db.First(&user, id).Error
 	return &user, err
 }

@@ -2,9 +2,10 @@ package controller
 
 import (
 	"net/http"
-	"sistem-manajemen-gudang/middleware"
-	"sistem-manajemen-gudang/model"
+	"sistem-manajemen-gudang/model/domain"
 	"sistem-manajemen-gudang/service"
+	"sistem-manajemen-gudang/helper"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,127 +13,112 @@ type ProductController struct {
 	service service.ProductService
 }
 
-func NewProductController(h service.ProductService) *ProductController {
-	return &ProductController{service: h}
+func NewProductController(s service.ProductService) *ProductController {
+	return &ProductController{service: s}
 }
 
-func (c *ProductController) RegisterRoutes(rg *gin.RouterGroup) {
-	rg.POST("/products/add", middleware.StaffOrAdmin(), c.AddProduct)
-	rg.GET("/products",middleware.StaffOrAdmin(), c.ListProduct)
-	rg.GET("/products/:id",middleware.StaffOrAdmin(), c.GetByID)
-	rg.PUT("/products/:id",middleware.StaffOrAdmin(), c.UpdateProduct)
-	rg.DELETE("/products/:id", middleware.StaffOrAdmin(),c.DeleteProduct)
-	rg.GET("/report-products",  middleware.AdminOnly() ,c.LaporanProduct)
-}
-
+//  POST /api/products
 func (c *ProductController) AddProduct(ctx *gin.Context) {
-	var p model.Product
-	if err := ctx.ShouldBindJSON(&p); err != nil || p.Name == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input tidak valid"})
+	var req domain.Product
+	if err := ctx.ShouldBindJSON(&req); err != nil || req.Name == "" {
+		helper.BadRequest(ctx, "Input tidak valid")
 		return
 	}
 
-	result, err := c.service.Create(p)
+	result, err := c.service.Create(req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal simpan"})
+		helper.InternalServerError(ctx, "Gagal menyimpan data produk")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, result)
+	helper.Success(ctx, http.StatusOK, result)
 }
-
+// GET /api/products
 func (c *ProductController) ListProduct(ctx *gin.Context) {
 	result, err := c.service.GetAll()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal ambil data"})
+		helper.InternalServerError(ctx, "Gagal mengambil data produk")
 		return
 	}
-	ctx.JSON(http.StatusOK, result)
+	helper.Success(ctx, http.StatusOK, result)
 }
+
+//  GET /api/products/:id
 func (c *ProductController) GetByID(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
 	}
 	if err := ctx.ShouldBindUri(&uri); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		helper.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
 	product, err := c.service.GetByID(uri.ID)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "Data tidak ditemukan"})
+		helper.NotFound(ctx, "Data produk tidak ditemukan")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, product)
+	helper.Success(ctx, http.StatusOK, product)
 }
 
+//  PUT /api/products/:id
 func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
 	}
-	var input struct {
-		Name     string      `json:"name" binding:"required"`
-		SKU      string      `gorm:"uniqueIndex" json:"sku" binding:"required"`
-		Category string      `json:"category" binding:"required"`
-		Unit     string      `json:"unit" binding:"required"`
-		Stock    int         `json:"stock" binding:"required"`
+	var req struct {
+		Name     string `json:"name" binding:"required"`
+		SKU      string `json:"sku" binding:"required"`
+		Category string `json:"category" binding:"required"`
+		Unit     string `json:"unit" binding:"required"`
+		Stock    int    `json:"stock" binding:"required"`
 	}
+
 	if err := ctx.ShouldBindUri(&uri); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
-		return
-	}
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Data input tidak valid"})
+		helper.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
-	product := model.Product{
-		ID:   uri.ID,
-		Name: input.Name,
-		SKU: input.SKU,
-		Category: input.Category,
-		Unit: input.Unit,
-		Stock: input.Stock,
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		helper.BadRequest(ctx, "Data input tidak valid")
+		return
+	}
+
+	product := domain.Product{
+		ID:       uri.ID,
+		Name:     req.Name,
+		SKU:      req.SKU,
+		Category: req.Category,
+		Unit:     req.Unit,
+		Stock:    req.Stock,
 	}
 
 	updated, err := c.service.Update(product)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update"})
+		helper.InternalServerError(ctx, "Gagal memperbarui data produk")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, updated)
+	helper.Success(ctx, http.StatusOK, updated)
 }
 
+//  DELETE /api/products/:id
 func (c *ProductController) DeleteProduct(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
 	}
 	if err := ctx.ShouldBindUri(&uri); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		helper.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
-	err := c.service.Delete(uri.ID)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal hapus"})
+	if err := c.service.Delete(uri.ID); err != nil {
+		helper.InternalServerError(ctx, "Gagal menghapus data produk")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Data berhasil dihapus"})
+	helper.Success(ctx, http.StatusOK, gin.H{"message": "Data produk berhasil dihapus"})
 }
-func (c *ProductController) LaporanProduct(ctx *gin.Context) {
-	startDate := ctx.Query("start")
-	endDate := ctx.Query("end")
 
-	products, err := c.service.GetLaporan(startDate, endDate)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil laporan"})
-		return
-	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"laporan": products,
-	})
-}

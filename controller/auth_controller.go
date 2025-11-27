@@ -11,7 +11,6 @@ import (
 type AuthController struct {
 	service service.AuthService
 }
-
 func NewAuthController(s service.AuthService) *AuthController {
 	return &AuthController{service: s}
 }
@@ -20,7 +19,6 @@ func AuthMiddleware() gin.HandlerFunc {
 	return middleware.JWTAuthMiddleware()
 }
 
-// POST /api/login
 func (c *AuthController) Login(ctx *gin.Context) {
 	var req struct {
 		Username string `json:"username" binding:"required"`
@@ -41,7 +39,6 @@ func (c *AuthController) Login(ctx *gin.Context) {
 	helper.Success(ctx, 200, gin.H{"token": token})
 }
 
-// DELETE /api/logout
 func (c *AuthController) Logout(ctx *gin.Context) {
 	userID, exists := ctx.Get("userID")
 	if !exists {

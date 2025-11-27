@@ -8,14 +8,12 @@ import (
 )
 
 func OutboundRoutes(rg *gin.RouterGroup, c *controller.OutboundController) {
-	outboundsGroup := rg.Group("/outbounds")
+	outboundsGroup := rg.Group("/outbound")
 	outboundsGroup.Use(middleware.StaffOrAdmin())
-
-
-	outboundsGroup.GET("/", c.ListOutbound)
+	outboundsGroup.GET("", c.ListOutbound)
 	outboundsGroup.POST("/add", c.AddOutbound)
 	outboundsGroup.GET("/:id", c.GetByID)
-	outboundsGroup.PUT("/:id", c.UpdateOutbound)
+	outboundsGroup.PATCH("/:id", c.UpdateOutbound)
 	outboundsGroup.DELETE("/:id", c.DeleteOutbound)
 
 	

@@ -18,9 +18,6 @@ func NewAuthRepository(db *gorm.DB) AuthRepository {
 	return &authRepository{db}
 }
 
-// func (r *userRepository) Save(user *domain.User) error {
-// 	return r.db.Create(user).Error
-// }
 
 func (r *authRepository) FindByUsername(username string) (*domain.User, error) {
 	var user domain.User

@@ -5,7 +5,6 @@ import (
 	"sistem-manajemen-gudang/service"
 	"sistem-manajemen-gudang/helper"
 	"time"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +16,6 @@ func NewInboundController(s service.InboundService) *InboundController {
 	return &InboundController{service: s}
 }
 
-//  GET /api/inbounds
 func (c *InboundController) ListInbound(ctx *gin.Context) {
 	result, err := c.service.GetAll()
 	if err != nil {
@@ -27,7 +25,6 @@ func (c *InboundController) ListInbound(ctx *gin.Context) {
 	helper.Success(ctx, http.StatusOK, result)
 }
 
-//  POST /api/inbounds
 func (c *InboundController) AddInbound(ctx *gin.Context) {
 	var inbound domain.Inbound
 	if err := ctx.ShouldBindJSON(&inbound); err != nil {
@@ -43,7 +40,7 @@ func (c *InboundController) AddInbound(ctx *gin.Context) {
 
 	helper.Success(ctx, http.StatusCreated, result)
 }
-// GET /api/inbounds/:id
+
 func (c *InboundController) GetByID(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
@@ -62,46 +59,37 @@ func (c *InboundController) GetByID(ctx *gin.Context) {
 	helper.Success(ctx, http.StatusOK, inbound)
 }
 
-//  PUT /api/inbounds/:id
 func (c *InboundController) UpdateInbound(ctx *gin.Context) {
-	var uri struct {
-		ID uint `uri:"id" binding:"required"`
-	}
-	var input struct {
-		ProductID  uint      `json:"product_id" binding:"required"`
-		Quantity   int       `json:"quantity" binding:"required"`
-		ReceivedAt time.Time `json:"received_at" binding:"required"`
-		Supplier   string    `json:"supplier" binding:"required"`
-	}
+    var uri struct {
+        ID uint `uri:"id" binding:"required"`
+    }
 
-	if err := ctx.ShouldBindUri(&uri); err != nil {
-		helper.BadRequest(ctx, "ID tidak valid")
-		return
-	}
+    if err := ctx.ShouldBindUri(&uri); err != nil {
+        helper.BadRequest(ctx, "ID tidak valid")
+        return
+    }
 
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		helper.BadRequest(ctx, "Data input tidak valid")
-		return
-	}
+    var input struct {
+        Supplier   string    `json:"supplier" binding:"required"`
+        ReceivedAt time.Time `json:"received_at" binding:"required"`
+    }
 
-	inbound := domain.Inbound{
-		ID:         uri.ID,
-		ProductID:  input.ProductID,
-		Quantity:   input.Quantity,
-		ReceivedAt: input.ReceivedAt,
-		Supplier:   input.Supplier,
-	}
+    if err := ctx.ShouldBindJSON(&input); err != nil {
+        helper.BadRequest(ctx, "Data input tidak valid")
+        return
+    }
 
-	updated, err := c.service.Update(inbound)
-	if err != nil {
-		helper.InternalServerError(ctx, "Gagal memperbarui data inbound")
-		return
-	}
+    updated, err := c.service.UpdateData(uri.ID, input.Supplier, input.ReceivedAt)
+    if err != nil {
+        helper.InternalServerError(ctx, "Gagal memperbarui data inbound")
+        return
+    }
 
-	helper.Success(ctx, http.StatusOK, updated)
+    helper.Success(ctx, http.StatusOK, updated)
 }
 
-//  DELETE /api/inbounds/:id
+
+
 func (c *InboundController) DeleteInbound(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`

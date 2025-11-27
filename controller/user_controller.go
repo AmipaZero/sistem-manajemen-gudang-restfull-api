@@ -12,16 +12,22 @@ type UserController struct {
 	service service.UserService
 }
 
+
 func NewUserController(s service.UserService) *UserController {
 	return &UserController{service: s}
 }
 
-// Middleware JWT untuk user
+// Middleware JWT 
 func UserMiddleware() gin.HandlerFunc {
 	return middleware.JWTAuthMiddleware()
 }
+func (c *UserController) RegisterPublicRoutes(rg *gin.RouterGroup) {
+    rg.POST("/register", c.Register)
+}
 
-// POST /api/register
+func (c *UserController) RegisterProtectedRoutes(rg *gin.RouterGroup) {
+    rg.GET("/current", c.Current)
+}
 func (c *UserController) Register(ctx *gin.Context) {
 	var req service.RegisterRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -37,7 +43,6 @@ func (c *UserController) Register(ctx *gin.Context) {
 	helper.Success(ctx, 200, gin.H{"message": "Register berhasil"})
 }
 
-// GET /api/users/me
 func (c *UserController) Current(ctx *gin.Context) {
 	userIDVal, exists := ctx.Get("userID")
 	if !exists {

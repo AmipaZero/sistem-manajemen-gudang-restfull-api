@@ -1,6 +1,7 @@
 package service
 
 import (
+	"sistem-manajemen-gudang/exception"
 	"sistem-manajemen-gudang/model/domain"
 	"sistem-manajemen-gudang/repository"
 )
@@ -23,8 +24,19 @@ func NewProductService(r repository.ProductRepository) ProductService {
 }
 
 func (s *productService) Create(p domain.Product) (domain.Product, error) {
-	return s.repo.Save(p)
+
+    product := domain.Product{
+        Name:     p.Name,
+        SKU:      p.SKU,
+        Category: p.Category,
+        Unit:     p.Unit,
+        Stock:    0, // stock selalu 0 saat create product
+    }
+
+    return s.repo.Save(product)
 }
+
+
 
 func (s *productService) GetAll() ([]domain.Product, error) {
 	return s.repo.FindAll()
@@ -34,8 +46,24 @@ func (s *productService) GetByID(id uint) (domain.Product, error) {
 }
 
 func (s *productService) Update(p domain.Product) (domain.Product, error) {
+	// Ambil produk lama
+	existing, err := s.repo.FindByID(p.ID)
+	if err != nil {
+		return existing, exception.ErrProductId
+	}
+
+	// STOCK TIDAK BOLEH DIUBAH MANUAL
+	p.Stock = existing.Stock
+
+	// SKU tidak boleh kosong
+	if p.SKU == "" {
+		return existing, exception.ErrProductSku
+	}
+
+	// Save perubahan 
 	return s.repo.Update(p)
 }
+
 
 func (s *productService) Delete(id uint) error {
 	return s.repo.Delete(id)

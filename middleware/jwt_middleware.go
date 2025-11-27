@@ -1,18 +1,22 @@
 package middleware
 
 import (
+	"net/http"
 	"sistem-manajemen-gudang/config"
 	"sistem-manajemen-gudang/model/domain"
 	"sistem-manajemen-gudang/util"
-	"net/http"
 	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-
 func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		 if c.Request.Method == "OPTIONS" {
+            c.AbortWithStatus(200)
+            return
+        }
 		authHeader := c.GetHeader("Authorization")
 		if !strings.HasPrefix(authHeader, "Bearer ") {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "token tidak sesuai"})
@@ -43,6 +47,8 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 
 func AdminOnly() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		
 		role, exists := c.Get("role")
 		if !exists {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus admin"})
@@ -59,6 +65,10 @@ func AdminOnly() gin.HandlerFunc {
 }
 func StaffOrAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		 if c.Request.Method == "OPTIONS" {
+            c.Next()
+            return
+        }
 		role, exists := c.Get("role")
 		if !exists {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "akses khusus staff dan admin"})

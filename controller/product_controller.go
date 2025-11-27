@@ -2,10 +2,9 @@ package controller
 
 import (
 	"net/http"
+	"sistem-manajemen-gudang/helper"
 	"sistem-manajemen-gudang/model/domain"
 	"sistem-manajemen-gudang/service"
-	"sistem-manajemen-gudang/helper"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +16,6 @@ func NewProductController(s service.ProductService) *ProductController {
 	return &ProductController{service: s}
 }
 
-//  POST /api/products
 func (c *ProductController) AddProduct(ctx *gin.Context) {
 	var req domain.Product
 	if err := ctx.ShouldBindJSON(&req); err != nil || req.Name == "" {
@@ -33,7 +31,7 @@ func (c *ProductController) AddProduct(ctx *gin.Context) {
 
 	helper.Success(ctx, http.StatusOK, result)
 }
-// GET /api/products
+
 func (c *ProductController) ListProduct(ctx *gin.Context) {
 	result, err := c.service.GetAll()
 	if err != nil {
@@ -43,7 +41,6 @@ func (c *ProductController) ListProduct(ctx *gin.Context) {
 	helper.Success(ctx, http.StatusOK, result)
 }
 
-//  GET /api/products/:id
 func (c *ProductController) GetByID(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
@@ -61,25 +58,22 @@ func (c *ProductController) GetByID(ctx *gin.Context) {
 
 	helper.Success(ctx, http.StatusOK, product)
 }
-
-//  PUT /api/products/:id
 func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`
 	}
-	var req struct {
-		Name     string `json:"name" binding:"required"`
-		SKU      string `json:"sku" binding:"required"`
-		Category string `json:"category" binding:"required"`
-		Unit     string `json:"unit" binding:"required"`
-		Stock    int    `json:"stock" binding:"required"`
-	}
-
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		helper.BadRequest(ctx, "ID tidak valid")
 		return
 	}
 
+	var req struct {
+		Name     string `json:"name"`
+		SKU      string `json:"sku"`
+		Category string `json:"category"`
+		Unit     string `json:"unit"`
+		// Stock tidak diterima di sini
+	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		helper.BadRequest(ctx, "Data input tidak valid")
 		return
@@ -91,19 +85,20 @@ func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 		SKU:      req.SKU,
 		Category: req.Category,
 		Unit:     req.Unit,
-		Stock:    req.Stock,
 	}
 
 	updated, err := c.service.Update(product)
 	if err != nil {
-		helper.InternalServerError(ctx, "Gagal memperbarui data produk")
+		helper.InternalServerError(ctx, err.Error())
 		return
 	}
 
 	helper.Success(ctx, http.StatusOK, updated)
 }
 
-//  DELETE /api/products/:id
+
+
+//  DELETE
 func (c *ProductController) DeleteProduct(ctx *gin.Context) {
 	var uri struct {
 		ID uint `uri:"id" binding:"required"`

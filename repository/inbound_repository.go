@@ -12,6 +12,9 @@ type InboundRepository interface {
 	FindByID(id uint) (domain.Inbound, error)
 	Update(i domain.Inbound) (domain.Inbound, error)
 	Delete(id uint) error
+	FindProductByID(id uint) (domain.Product, error)
+	UpdateProduct(p domain.Product) error
+
 }
 
 type inboundRepository struct {
@@ -43,15 +46,33 @@ func (r *inboundRepository) FindByID(id uint) (domain.Inbound, error) {
 }
 
 func (r *inboundRepository) Update(i domain.Inbound) (domain.Inbound, error) {
-	err := r.db.Model(&i).Updates(i).Error
-	if err != nil {
-		return i, err
-	}
-	r.db.Preload("Product").First(&i, i.ID)
-	return i, nil
+    err := r.db.Model(&domain.Inbound{}).
+        Where("id = ?", i.ID).
+        Updates(map[string]interface{}{
+            "supplier":    i.Supplier,
+            "received_at": i.ReceivedAt,
+        }).Error
+
+    if err != nil {
+        return i, err
+    }
+
+    // Ambil ulang data setelah update
+    r.db.Preload("Product").First(&i, i.ID)
+    return i, nil
 }
+
 
 func (r *inboundRepository) Delete(id uint) error {
 	return r.db.Delete(&domain.Inbound{}, id).Error
+}
+func (r *inboundRepository) FindProductByID(id uint) (domain.Product, error) {
+    var product domain.Product
+    err := r.db.First(&product, id).Error
+    return product, err
+}
+
+func (r *inboundRepository) UpdateProduct(p domain.Product) error {
+    return r.db.Model(&p).Updates(p).Error
 }
 

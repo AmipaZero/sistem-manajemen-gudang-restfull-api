@@ -28,4 +28,5 @@ func (r *userRepository) FindByID(id uint) (*domain.User, error) {
 		return nil, err
 	}
 	return &user, nil
+	
 }

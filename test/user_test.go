@@ -113,7 +113,6 @@ func TestCurrentUserSuccess(t *testing.T) {
 	authRepo := repository.NewAuthRepository(db)
 	authService := service.NewAuthService(authRepo)
 
-	// login untuk dapetin token
 	token, err := authService.Login(user.Username, "password123")
 	if err != nil {
 		t.Fatalf("failed to login user: %v", err)

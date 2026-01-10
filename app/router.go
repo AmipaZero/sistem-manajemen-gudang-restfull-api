@@ -16,10 +16,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// "sistem-manajemen-gudang/middleware"
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	r := gin.Default()
-	// pasang CORS global
 	r.Use(cors.New(cors.Config{
 		
 		AllowOrigins:     []string{"http://localhost:5173","http://localhost:10917",},
@@ -53,7 +51,6 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	
 
-	// --- Group tanpa JWT (public) ---
 	public := r.Group("/api/auth")
 	{
 		public.POST("/login", authController.Login)
@@ -62,7 +59,6 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	}
 
-	// --- Group dengan JWT (protected) ---
 	protected := r.Group("/api")
 	
 	protected.Use(middleware.JWTAuthMiddleware())

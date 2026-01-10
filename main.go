@@ -24,7 +24,7 @@ func main() {
 	r := app.SetupRouter(db)
 
 	// Run server
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(":3000"); err != nil {
 		log.Fatal("❌ Gagal menjalankan server:", err)
 	}
 }

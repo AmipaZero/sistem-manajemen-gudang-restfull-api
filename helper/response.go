@@ -1,5 +1,7 @@
 package helper
+
 import (
+	"log"
 	"net/http"
 	"sistem-manajemen-gudang/model/web"
 	"github.com/gin-gonic/gin"
@@ -53,4 +55,10 @@ func InternalServerError(ctx *gin.Context, message string) {
 		Status: "ERROR",
 		Data:   gin.H{"message": message},
 	})
+}
+
+func PanicIfError(err error) {
+	if err != nil {
+		log.Panic(err)
+	}
 }

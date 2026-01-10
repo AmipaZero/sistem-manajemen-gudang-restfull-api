@@ -3,11 +3,12 @@ package router
 import (
 	"sistem-manajemen-gudang/controller"
 	"sistem-manajemen-gudang/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
 func InboundRoutes(rg *gin.RouterGroup, c *controller.InboundController) {
-	inboundGroup := rg.Group("/inbound")
+	inboundGroup := rg.Group("/inbounds")
 	inboundGroup.Use(middleware.StaffOrAdmin())
 	inboundGroup.GET("", c.ListInbound)
 	inboundGroup.POST("/add", c.AddInbound)
